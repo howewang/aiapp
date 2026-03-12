@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useWebSocket } from '@/contexts/WebSocketContext';
 import { matchStart, matchCancel } from '@/services/backendApi';
+import { getToken } from '@/services/backendAuthService';
 import { USE_BACKEND_API } from '@/constants/api';
 
 export type MatchStatus = 'idle' | 'searching' | 'matched' | 'error';
@@ -41,6 +42,11 @@ export function useMatching() {
     setSessionId(null);
 
     if (USE_BACKEND_API && user?.id) {
+      const token = await getToken();
+      if (!token) {
+        setStatus('error');
+        return;
+      }
       try {
         const res = await matchStart();
         if (res.status === 'matched' && res.matchedUser) {
