@@ -60,7 +60,11 @@ export async function register(
   if (body.code !== 0) {
     return { success: false, message: body.msg || '注册失败' };
   }
-  const { user, token } = body.data!;
+  const data = body.data;
+  if (!data || !data.user || !data.token) {
+    return { success: false, message: body.msg || '注册失败，未返回token' };
+  }
+  const { user, token } = data;
   await AsyncStorage.setItem(TOKEN_KEY, token);
   await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
   return { success: true, message: '注册成功', user, token };
@@ -74,7 +78,11 @@ export async function login(phone: string, password: string): Promise<AuthResult
   if (body.code !== 0) {
     return { success: false, message: body.msg || '登录失败' };
   }
-  const { user, token } = body.data!;
+  const data = body.data;
+  if (!data || !data.user || !data.token) {
+    return { success: false, message: body.msg || '登录失败，未返回token' };
+  }
+  const { user, token } = data;
   await AsyncStorage.setItem(TOKEN_KEY, token);
   await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
   return { success: true, message: '登录成功', user, token };
